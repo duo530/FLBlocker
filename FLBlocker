@@ -1,0 +1,41 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+echo "FLBlocker - Family Link Blocker (by simpleuser)"
+read -p "Select your language.
+1 - en-US
+2 - pt-BR
+" lang
+
+if [[ "$lang" = "1" ]]; then
+    read -p "In what time your device will be blocked? (HH:MM) " timeblock
+else
+    read -p "Qual o horário em que seu dispositivo vai ser bloqueado? (HH:MM) " timeblock
+fi
+
+timeblock_hours=${timeblock:0:2}
+timeblock_minutes=${timeblock:3:2}
+timeblock_total_minutes=$((10#$timeblock_hours * 60 + 10#$timeblock_minutes))
+
+timeblock2_total_minutes=$((timeblock_total_minutes - 2))
+timeblock2_hours=$((timeblock2_total_minutes / 60))
+timeblock2_minutes=$((timeblock2_total_minutes % 60))
+
+timeblock2=$(printf "%02d:%02d" $timeblock2_hours $timeblock2_minutes)
+
+echo "Please click in DELETE to accept FLBlocker to be deleted from economy of energy interruptions.
+
+Por favor clique em EXCLUIR para aceitar que o FLBlocker fique fora da lista de interrupção da economia de bateria.
+(Ignore this warn if you already did it.)
+
+(Ignore este aviso se você já fez isso.)"
+sleep 4
+
+termux-wake-lock
+
+while true; do
+    current_time=$(date +%H:%M)
+    if [[ "$current_time" == "$timeblock2" ]]; then
+        termux-wifi-enable false
+        break
+    fi
+done
